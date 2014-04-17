@@ -19,11 +19,13 @@ public:
     pthread_mutex_lock(&this->_mutex);
   }
   void	unlock() {
-    pthread_mutex_lock(&this->_mutex);
+    pthread_mutex_unlock(&this->_mutex);
   }
 
   bool	trylock() {
-    pthread_mutex_lock(&this->_mutex);
+    if (pthread_mutex_trylock(&this->_mutex) != 0)
+      return false;
+    return true;
   }
 
 private:

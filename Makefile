@@ -1,6 +1,7 @@
 NAME	=	yolo
 
-SRC	=	main.cpp
+SRC	=	main.cpp \
+		SafeQueue.cpp
 
 OBJ	=	$(SRC:.cpp=.o)
 

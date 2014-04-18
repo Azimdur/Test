@@ -7,7 +7,7 @@ class	Mutex : public IMutex
 {
 public:
   Mutex() {
-    _mutex = PTHREAD_MUTEX_INITIALIZER;
+    this->_mutex = PTHREAD_MUTEX_INITIALIZER;
   }
 
   ~Mutex() {

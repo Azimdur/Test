@@ -1,40 +1,40 @@
 #include	<iostream>
 #include	<cstdlib>
-#include	"ScopedLock.hh"
+#include	"Producer.hh"
+#include	"Consumer.hh"
+#include	"SafeQueue.hh"
 #include	"Thread.hh"
 
-typedef struct	s_data
-{
-  int		i;
-  Mutex		*mutex;
-}		t_data;
-
-void	*increment_counter(void *n)
-{
-  t_data	*data = reinterpret_cast<t_data *>(n);
-  ScopedLock	sl(data->mutex);
-  
-  for (int o = 0; o < 100000; ++o)
-    ++(data->i);
-  return (NULL);
-}
+#include	<list>
+#include	<pair>
 
 int	main()
 {
-  t_data	data;
-  Mutex		*m = new Mutex;
-  
-  data = {0, m};
+  Mutex			*mutex = new Mutex();
+  SafeQueue		*_queue = new SafeQueue();
+  pthread_cond_t	cond;
 
-  Thread	*t1 = new Thread(&increment_counter, &data);
-  Thread	*t2 = new Thread(&increment_counter, &data);
-  
-  t1->start();
-  t2->start();
-  
-  t1->wait();
-  t2->wait();
-  
-  std::cout << "i : " << data.i <<std::endl;
+  std::list<std::pair<Producer *, Thread *> > _prod; 
+  std::list<std::pair<Consumer *, Thread *> > _cons;
+
+  for (int i = 0; i != 3; ++i)
+    {
+      Consumer	*c = new Consumer(i, _queue, _mutex, &cond);
+      Thread	*th = new Thread(&start_consumer, (void *) c);
+      std::pair<Consumer *, Thread *>	couple(c, th);
+
+      th->start();
+      _cons.push_back(couple);
+    }
+
+    for (int i = 0; i != 3; ++i)
+    {
+      Producer	*p = new Producer(i, _queue, _mutex, &cond);
+      Thread	*th = new Thread(&start_producer, (void *) c);
+      std::pair<Consumer *, Thread *>	couple(c, th);
+
+      th->start();
+      _prod.push_back(couple);
+    }
   return (0);
 }

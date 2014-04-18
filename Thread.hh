@@ -20,10 +20,7 @@ public:
     _status = OFF;
     _return = NULL;
   }
-  ~Thread()
-  {
-    /*kill du thread voir cour*/
-  }
+  ~Thread() {}
 
 public:
   void	start() {
@@ -32,6 +29,7 @@ public:
   }
   void	wait() {
     pthread_join(this->_thr, &this->_return);
+    this->_status = DEAD;
   }
   e_status	getStatus() const {
     return (this->_status);

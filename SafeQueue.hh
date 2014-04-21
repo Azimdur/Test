@@ -13,6 +13,12 @@ public:
 public:
   void	push(int value);
   bool	tryPop(int *value);
+  bool	isEmpty() const 
+  {
+    if (this->_queue.empty())
+      return true;
+    return false;
+  }
   bool	isFinished();
   void	setFinished();
 

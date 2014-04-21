@@ -6,12 +6,14 @@
 #include	"Thread.hh"
 
 #include	<list>
-#include	<pair>
+#include	<utility>
 
 int	main()
 {
-  Mutex			*mutex = new Mutex();
+  std::cout << "Première ligne" << std::endl;  
+  Mutex			*_mutex = new Mutex();
   SafeQueue		*_queue = new SafeQueue();
+  std::cout << "queue ok" << std::endl;  
   pthread_cond_t	cond;
 
   std::list<std::pair<Producer *, Thread *> > _prod; 
@@ -23,18 +25,45 @@ int	main()
       Thread	*th = new Thread(&start_consumer, (void *) c);
       std::pair<Consumer *, Thread *>	couple(c, th);
 
+      std::cout << "avant start" << std::endl;  
       th->start();
+      std::cout << "après start" << std::endl;  
       _cons.push_back(couple);
     }
 
-    for (int i = 0; i != 3; ++i)
+  std::cout << "Etape 1" << std::endl;  
+  for (int i = 0; i != 3; ++i)
     {
       Producer	*p = new Producer(i, _queue, _mutex, &cond);
-      Thread	*th = new Thread(&start_producer, (void *) c);
-      std::pair<Consumer *, Thread *>	couple(c, th);
-
+      Thread	*th = new Thread(&start_producer, (void *) p);
+      std::pair<Producer *, Thread *>	couple(p, th);
+      
       th->start();
       _prod.push_back(couple);
     }
+
+  std::cout << "Etape 2" << std::endl;  
+  for (int i = 0; i != 3; ++i)
+    {
+      std::pair<Producer *, Thread *> couple = _prod.back();
+      
+      couple.second->wait();
+      delete couple.first; delete couple.second;
+      _cons.pop_back();
+    }
+  _queue->setFinished();
+
+  std::cout << "Etape 3" << std::endl;  
+  for (int i = 0; i != 3; ++i)
+    {
+      std::pair<Consumer*, Thread *> couple = _cons.back();
+      
+      pthread_cond_broadcast(&cond);
+      couple.second->wait();
+      delete couple.first; delete couple.second;
+      _cons.pop_back();
+    }
+
+  std::cout << "Etape 4" << std::endl;  
   return (0);
 }

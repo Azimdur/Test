@@ -28,6 +28,8 @@ public:
     return true;
   }
 
+  pthread_mutex_t	getMut() const {return this->_mutex;}
+
 private:
   pthread_mutex_t	_mutex;
 };

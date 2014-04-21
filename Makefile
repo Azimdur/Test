@@ -1,11 +1,13 @@
 NAME	=	yolo
 
 SRC	=	main.cpp \
-		SafeQueue.cpp
+		SafeQueue.cpp \
+		Consumer.cpp \
+		Producer.cpp
 
 OBJ	=	$(SRC:.cpp=.o)
 
-CXXFLAGS	+=	-std=c++11
+CXXFLAGS	+=	-std=c++11 -fpermissive
 
 all	:	$(NAME)
 
